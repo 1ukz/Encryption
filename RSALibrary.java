@@ -15,152 +15,167 @@ import java.security.Security;
 import java.security.Signature;
 import javax.crypto.Cipher;
 
-
 public class RSALibrary {
 
-  // String to hold name of the encryption algorithm.
-  public final String ALGORITHM = "RSA";
+	// String to hold name of the encryption algorithm.
+	public final String ALGORITHM = "RSA";
 
-  //String to hold the name of the private key file.
-  public final String PRIVATE_KEY_FILE = "./private.key";
+	// String to hold the name of the private key file.
+	public final String PRIVATE_KEY_FILE = "./private.key";
 
-  // String to hold name of the public key file.
-  public final String PUBLIC_KEY_FILE = "./public.key";
+	// String to hold name of the public key file.
+	public final String PUBLIC_KEY_FILE = "./public.key";
 
-  /***********************************************************************************/
-   /* Generates an RSA key pair (a public and a private key) of 1024 bits length */
-   /* Stores the keys in the files defined by PUBLIC_KEY_FILE and PRIVATE_KEY_FILE */
-   /* Throws IOException */
-  /***********************************************************************************/
-  public void generateKeys() throws IOException {
+	/***********************************************************************************/
+	/* Generates an RSA key pair (a public and a private key) of 1024 bits length */
+	/*
+	 * Stores the keys in the files defined by PUBLIC_KEY_FILE and PRIVATE_KEY_FILE
+	 */
+	/* Throws IOException */
+	/***********************************************************************************/
+	public void generateKeys() throws IOException {
 
-    try {
+		try {
+			// Generar el par de claves usando el algoritmo especificado (RSA en este caso)
+			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM);
+			keyGen.initialize(1024); // Tamaño de la clave en bits
+			KeyPair keyPair = keyGen.generateKeyPair(); // Genera las claves
 
-      final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM);
-      keyGen.initialize(1024);
+			PublicKey publicKey = keyPair.getPublic(); // Obtener clave pública
+			PrivateKey privateKey = keyPair.getPrivate(); // Obtener clave privada
 
-	  // TO-DO: Use KeyGen to generate a public and a private key
-      // ...
+			// Guardar la clave pública en el archivo PUBLIC_KEY_FILE
+			try (FileOutputStream fos = new FileOutputStream(PUBLIC_KEY_FILE)) {
+				fos.write(publicKey.getEncoded()); // Codificar y escribir la clave pública en binario
+			}
 
-	  // TO-DO: store the public key in the file PUBLIC_KEY_FILE
-	  // ...
+			// Guardar la clave privada en el archivo PRIVATE_KEY_FILE
+			try (FileOutputStream fos = new FileOutputStream(PRIVATE_KEY_FILE)) {
+				fos.write(privateKey.getEncoded()); // Codificar y escribir la clave privada en binario
+			}
 
-	  // TO-DO: store the private key in the file PRIVATE_KEY_FILE
-	  // ...
+			System.out.println("Las claves se generaron y guardaron correctamente.");
 
-	} catch (NoSuchAlgorithmException e) {
-		System.out.println("Exception: " + e.getMessage());
-		System.exit(-1);
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println("Exception: " + e.getMessage());
+			System.exit(-1);
+		}
 	}
-  }
 
+	/***********************************************************************************/
+	/* Encrypts a plaintext using an RSA public key. */
+	/* Arguments: the plaintext and the RSA public key */
+	/* Returns a byte array with the ciphertext */
+	/***********************************************************************************/
+	public byte[] encrypt(byte[] plaintext, PublicKey key) {
 
-  /***********************************************************************************/
-  /* Encrypts a plaintext using an RSA public key. */
-  /* Arguments: the plaintext and the RSA public key */
-  /* Returns a byte array with the ciphertext */
-  /***********************************************************************************/
-  public byte[] encrypt(byte[] plaintext, PublicKey key) {
+		byte[] ciphertext = null;
 
-    byte[] ciphertext = null;
+		try {
+			// Obtiene un objeto de cifrado RSA
+			final Cipher cipher = Cipher.getInstance(ALGORITHM);
 
-    try {
+			// Inicializa el objeto Cipher en modo de encriptación con la clave pública
+			cipher.init(Cipher.ENCRYPT_MODE, key);
 
-      // Gets an RSA cipher object
-      final Cipher cipher = Cipher.getInstance(ALGORITHM);
+			// Encripta el texto plano (plaintext) y lo convierte en texto cifrado
+			// (ciphertext)
+			ciphertext = cipher.doFinal(plaintext);
 
-      // TO-DO: initialize the cipher object and use it to encrypt the plaintext
-	  // ...
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ciphertext;
+	}
 
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return ciphertext;
-  }
+	/***********************************************************************************/
+	/* Decrypts a ciphertext using an RSA private key. */
+	/* Arguments: the ciphertext and the RSA private key */
+	/* Returns a byte array with the plaintext */
+	/***********************************************************************************/
+	public byte[] decrypt(byte[] ciphertext, PrivateKey key) {
 
+		byte[] plaintext = null;
 
-  /***********************************************************************************/
-  /* Decrypts a ciphertext using an RSA private key. */
-  /* Arguments: the ciphertext and the RSA private key */
-  /* Returns a byte array with the plaintext */
-  /***********************************************************************************/
-  public byte[] decrypt(byte[] ciphertext, PrivateKey key) {
+		try {
+			// Obtiene un objeto de cifrado RSA
+			final Cipher cipher = Cipher.getInstance(ALGORITHM);
 
-    byte[] plaintext = null;
+			// Inicializa el objeto Cipher en modo de desencriptación con la clave privada
+			cipher.init(Cipher.DECRYPT_MODE, key);
 
-    try {
-      // Gets an RSA cipher object
-      final Cipher cipher = Cipher.getInstance(ALGORITHM);
+			// Desencripta el texto cifrado (ciphertext) y lo convierte en texto plano
+			// (plaintext)
+			plaintext = cipher.doFinal(ciphertext);
 
-      // TO-DO: initialize the cipher object and use it to decrypt the ciphertext
-	  // ...
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
+		return plaintext;
+	}
 
-    return plaintext;
-  }
+	/***********************************************************************************/
+	/* Signs a plaintext using an RSA private key. */
+	/* Arguments: the plaintext and the RSA private key */
+	/* Returns a byte array with the signature */
+	/***********************************************************************************/
+	public byte[] sign(byte[] plaintext, PrivateKey key) {
 
-  /***********************************************************************************/
-  /* Signs a plaintext using an RSA private key. */
-  /* Arguments: the plaintext and the RSA private key */
-  /* Returns a byte array with the signature */
-  /***********************************************************************************/
-  public byte[] sign(byte[] plaintext, PrivateKey key) {
-		
-    byte[] signedInfo = null;
+		byte[] signedInfo = null;
 
-    try {
+		try {
 
-	  // Gets a Signature object
-      Signature signature = Signature.getInstance("SHA1withRSA");
+			// Gets a Signature object
+			Signature signature = Signature.getInstance("SHA1withRSA");
 
-	  // TO-DO: initialize the signature oject with the private key
-	  // ...
-	
-	  // TO-DO: set plaintext as the bytes to be signed
-	  // ...
-	
-	  // TO-DO: sign the plaintext and obtain the signature (signedInfo)
-	  // ...
+			// TO-DO: initialize the signature oject with the private key
+			// ...
 
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
+			// TO-DO: set plaintext as the bytes to be signed
+			// ...
 
-	return signedInfo;
-  }
-	
-  /***********************************************************************************/
-  /* Verifies a signature over a plaintext */
-  /* Arguments: the plaintext, the signature to be verified (signed) 
-  /* and the RSA public key */
-  /* Returns TRUE if the signature was verified, false if not */
-  /***********************************************************************************/
-  public boolean verify(byte[] plaintext, byte[] signed, PublicKey key) {
+			// TO-DO: sign the plaintext and obtain the signature (signedInfo)
+			// ...
 
-	boolean result = false;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
-    try {
+		return signedInfo;
+	}
 
- 	 // Gets a Signature object
-     Signature signature = Signature.getInstance("SHA1withRSA");
+	/***********************************************************************************/
+	/* Verifies a signature over a plaintext */
+	/*
+	 * Arguments: the plaintext, the signature to be verified (signed) /* and the
+	 * RSA public key
+	 */
+	/* Returns TRUE if the signature was verified, false if not */
+	/***********************************************************************************/
+	public boolean verify(byte[] plaintext, byte[] signed, PublicKey key) {
 
-	  // TO-DO: initialize the signature oject with the public key
-	  // ...
+		boolean result = false;
 
-	  // TO-DO: set plaintext as the bytes to be veryfied
-	  // ...
+		try {
 
-	  // TO-DO: verify the signature (signed). Store the outcome in the boolean result
-	  // ...
-	
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
+			// Gets a Signature object
+			Signature signature = Signature.getInstance("SHA1withRSA");
 
-	return result;
-  }
-	
+			// TO-DO: initialize the signature oject with the public key
+			// ...
+
+			// TO-DO: set plaintext as the bytes to be veryfied
+			// ...
+
+			// TO-DO: verify the signature (signed). Store the outcome in the boolean result
+			// ...
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return result;
+	}
+
 }

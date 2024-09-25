@@ -54,23 +54,42 @@ public class Test_RSA {
         System.out.println("Decrypted: " + new String(decrypted2));  
 		
 		/* ENCRIPTACION ASIMETRICA */
-		//RSALibrary r = new RSALibrary();
-		//r.generateKeys();
+		RSALibrary r = new RSALibrary();
+		r.generateKeys();
 		
 		/* Read  public key*/
-		//Path path = Paths.get("./public.key");
-		//byte[] bytes = Files.readAllBytes(path);
+		Path path = Paths.get("./public.key");
+		byte[] bytes = Files.readAllBytes(path);
 		//Public key is stored in x509 format
-		//X509EncodedKeySpec keyspec = new X509EncodedKeySpec(bytes);
-		//KeyFactory keyfactory = KeyFactory.getInstance("RSA");
-		//PublicKey publicKey = keyfactory.generatePublic(keyspec);
+		X509EncodedKeySpec keyspec = new X509EncodedKeySpec(bytes);
+		KeyFactory keyfactory = KeyFactory.getInstance("RSA");
+		PublicKey publicKey = keyfactory.generatePublic(keyspec);
 		
 		/* Read private key */
-		//path = Paths.get("./private.key");
-		//byte[] bytes2 = Files.readAllBytes(path);
+		path = Paths.get("./private.key");
+		byte[] bytes2 = Files.readAllBytes(path);
 		//Private key is stored in PKCS8 format
-		//PKCS8EncodedKeySpec keyspec2 = new PKCS8EncodedKeySpec(bytes2);
-		//KeyFactory keyfactory2 = KeyFactory.getInstance("RSA");
-		//PrivateKey privateKey = keyfactory2.generatePrivate(keyspec2);
+		PKCS8EncodedKeySpec keyspec2 = new PKCS8EncodedKeySpec(bytes2);
+		KeyFactory keyfactory2 = KeyFactory.getInstance("RSA");
+		PrivateKey privateKey = keyfactory2.generatePrivate(keyspec2);
+		
+		/* Encrypt */
+		System.out.println(".....MESSAGE RSA.....");
+		byte[] messageRSA = "Hola mundooo!".getBytes();
+        System.out.println("Plain text message: " + new String (messageRSA));
+        System.out.println("Length of plain text message: " + messageRSA.length);
+        
+        /* Decrypt */
+		System.out.println("......ENCRYPTION RSA.....");
+        byte[] encryptedRSA = r.encrypt(messageRSA, publicKey);
+        System.out.println("Encrypted: " + new String(encryptedRSA));
+        String encryptedRSABase64 = Base64.getEncoder().encodeToString(encryptedRSA); 
+        System.out.println("Encrypted (Base64): " + encryptedRSABase64);
+        System.out.println("Length of encrypted text message:"  + encryptedRSA.length);
+        System.out.println(".....DECRYPTION.....");
+        byte[] decryptedRSA = r.decrypt(encryptedRSA, privateKey);
+        System.out.println("Decrypted: " + new String(decryptedRSA));
+        
+        
 	}
 }
