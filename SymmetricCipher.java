@@ -4,16 +4,13 @@ import java.util.Arrays;
 
 public class SymmetricCipher {
 
-	//clave de cifrado
+    // Clave de cifrado
     byte[] byteKey;
 
     SymmetricEncryption s;
     SymmetricEncryption d;
-    
-    //num de padding aniadido
-    int paddingLength;
 
-    // iv inicializado como constante
+    // IV inicializado como constante
     static byte[] iv = new byte[] { 
         (byte)49, (byte)50, (byte)51, (byte)52, (byte)53, (byte)54, 
         (byte)55, (byte)56, (byte)57, (byte)48, (byte)49, (byte)50, 
@@ -28,36 +25,35 @@ public class SymmetricCipher {
     /* method to add PKCS#5 padding */
     private byte[] addPadding(byte[] input) {
     	
-        if (input.length % 16 != 0) {       	
-	        // calcula del input, cuanto padding hara falta en el bloque necesario
-	        paddingLength = 16 - (input.length % 16); 
-	        // crea un nuevo array que contendra la longitud del input mas el padding, lo que ya hara que se pueda dividir perfectamente en bloques de 16
-	        byte[] padded = new byte[input.length + paddingLength];
-	        // copia los datos de un array al otro, es decir, los datos originales pero faltarian las posiciones donde va el padding por rellenar
-	        System.arraycopy(input, 0, padded, 0, input.length);
-	        // llena lo que queda del array con los datos copiados con el padding de PKCS#5
-	        for (int i = 0; i < paddingLength; i++) {
-	        	padded[input.length + i] = (byte) paddingLength;
-	        }   
-	        return padded;
-        }else {
-        	
-        	return input;
+        int paddingLength = 16 - (input.length % 16); 
+        
+        // si el input es multiplo de 16, aniade un bloque completo de padding
+        if (paddingLength == 0) {
+            paddingLength = 16;
         }
+        
+        // Crea un nuevo array que contendra el input con el padding aniadido
+        byte[] padded = new byte[input.length + paddingLength];
+        System.arraycopy(input, 0, padded, 0, input.length);
+        
+        // llena el padding con el valor de paddingLength
+        for (int i = 0; i < paddingLength; i++) {
+            padded[input.length + i] = (byte) paddingLength;
+        }
+        return padded;
     }
 
     /* method to remove PKCS#5 padding */
     private byte[] removePadding(byte[] input) {
-  		
-    		//creamos un nuevo array con el tamanio de el input descifrado con el padding menos el num de padding que hay
-    		byte[] decipheredText = new byte[input.length - this.paddingLength];
-    		//copiamos el array sin el padding
-    		decipheredText = Arrays.copyOfRange(input, 0, input.length - this.paddingLength);
-    		
-    		return decipheredText;
+    	
+    	// El ultimo byte del texto en claro contiene el numero de bytes de padding añadidos
+        int paddingLength = input[input.length - 1];
+        
+        // Crea un nuevo array sin el padding
+        return Arrays.copyOfRange(input, 0, input.length - paddingLength);
     }
 
-    /* method to encrypt using AES/CBC/PKCS5 */
+    /* Method to encrypt using AES/CBC/PKCS5 */
     public byte[] encryptCBC(byte[] input, byte[] byteKey) throws Exception {
         // crea una instancia de SymmetricEncryption con la clave dada
         SymmetricEncryption aes = new SymmetricEncryption(byteKey);
@@ -123,8 +119,4 @@ public class SymmetricCipher {
         // devuelve el texto cifrado al completo
         return removePadding(paddedDecipheredText);
     }
-    	
-    	
 }
-       
-

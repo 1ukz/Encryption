@@ -20,7 +20,7 @@ public class Test_RSA {
 
         
         System.out.println(".....MESSAGE.....");
-		byte[] message = "Hola mundooo!".getBytes(); // Texto de prueba
+		byte[] message = "Hola mundooo001!".getBytes(); // Texto de prueba
         
         System.out.println("Plain text message: " + new String (message));
         System.out.println("Length of plain text message: " + message.length);
