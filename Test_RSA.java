@@ -20,7 +20,7 @@ public class Test_RSA {
 
         
         System.out.println(".....MESSAGE.....");
-		byte[] message = "Hola mundooo001!".getBytes(); // Texto de prueba
+		byte[] message = "Hola mundooo!".getBytes(); // Texto de prueba
         
         System.out.println("Plain text message: " + new String (message));
         System.out.println("Length of plain text message: " + message.length);
@@ -78,17 +78,46 @@ public class Test_RSA {
 		byte[] messageRSA = "Hola mundooo!".getBytes();
         System.out.println("Plain text message: " + new String (messageRSA));
         System.out.println("Length of plain text message: " + messageRSA.length);
-        
-        /* Decrypt */
 		System.out.println("......ENCRYPTION RSA.....");
         byte[] encryptedRSA = r.encrypt(messageRSA, publicKey);
         System.out.println("Encrypted: " + new String(encryptedRSA));
         String encryptedRSABase64 = Base64.getEncoder().encodeToString(encryptedRSA); 
         System.out.println("Encrypted (Base64): " + encryptedRSABase64);
         System.out.println("Length of encrypted text message:"  + encryptedRSA.length);
+        
+        /* Decrypt */
         System.out.println(".....DECRYPTION.....");
         byte[] decryptedRSA = r.decrypt(encryptedRSA, privateKey);
         System.out.println("Decrypted: " + new String(decryptedRSA));
+        
+        /* FIRMA Y VERIFICACION */
+        
+        /* Sign */
+        System.out.println(".....MESSAGE TO SIGN.....");
+		byte[] messageToSign = "Hola mundooo!".getBytes();
+        System.out.println("Plain text message: " + new String (messageToSign));
+        System.out.println("Length of plain text message: " + messageToSign.length);
+        
+		System.out.println("......SIGNING.....");
+        byte[] messageSigned = r.sign(messageRSA, privateKey);
+        System.out.println("Signed: " + new String(messageSigned));
+        String signedBase64 = Base64.getEncoder().encodeToString(messageSigned); 
+        System.out.println("Signed (Base64): " + signedBase64);
+        System.out.println("Length of encrypted text message:"  + messageSigned.length);
+        
+        /* Verify */
+
+        System.out.println(".....VERIFY.....");
+        boolean verified = r.verify(messageToSign, messageSigned, publicKey);
+        String status = String.format("Verification status: %s", verified ? "Verified" : "Not verified");
+        System.out.println(status);
+        
+        /* Fail Verify */
+        System.out.println(".....VERIFY FAIL.....");
+        byte[] messageToSignFail = "Fail".getBytes();
+        boolean verifiedFail = r.verify(messageToSignFail, messageSigned, publicKey);
+        String statusFail = String.format("Verification status: %s", verifiedFail ? "Verified" : "Not verified");
+        System.out.println(statusFail);
         
         
 	}

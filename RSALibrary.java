@@ -54,7 +54,7 @@ public class RSALibrary {
 				fos.write(privateKey.getEncoded()); // Codificar y escribir la clave privada en binario
 			}
 
-			System.out.println("Las claves se generaron y guardaron correctamente.");
+			System.out.println("Keys have been generated correctly.");
 
 		} catch (NoSuchAlgorithmException e) {
 			System.out.println("Exception: " + e.getMessage());
@@ -116,66 +116,65 @@ public class RSALibrary {
 	}
 
 	/***********************************************************************************/
-	/* Signs a plaintext using an RSA private key. */
-	/* Arguments: the plaintext and the RSA private key */
-	/* Returns a byte array with the signature */
-	/***********************************************************************************/
-	public byte[] sign(byte[] plaintext, PrivateKey key) {
+    /* Signs a plaintext using an RSA private key. */
+    /* Arguments: the plaintext and the RSA private key */
+    /* Returns a byte array with the signature */
+    /***********************************************************************************/
+    public byte[] sign(byte[] plaintext, PrivateKey key) {
 
-		byte[] signedInfo = null;
+        byte[] signedInfo = null;
 
-		try {
+        try {
 
-			// Gets a Signature object
-			Signature signature = Signature.getInstance("SHA1withRSA");
+            // Gets a signature object
+            Signature signature = Signature.getInstance("SHA1withRSA");
 
-			// TO-DO: initialize the signature oject with the private key
-			// ...
+            // Initialize the signature object with the private key
+            signature.initSign(key);
 
-			// TO-DO: set plaintext as the bytes to be signed
-			// ...
+            // Set plaintext as the bytes to be signed
+            signature.update(plaintext);
 
-			// TO-DO: sign the plaintext and obtain the signature (signedInfo)
-			// ...
+            // Sign the plaintext and obtain the signature (signedInfo)
+            signedInfo = signature.sign();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-		return signedInfo;
-	}
+        return signedInfo;
+    }
 
-	/***********************************************************************************/
-	/* Verifies a signature over a plaintext */
-	/*
-	 * Arguments: the plaintext, the signature to be verified (signed) /* and the
-	 * RSA public key
-	 */
-	/* Returns TRUE if the signature was verified, false if not */
-	/***********************************************************************************/
-	public boolean verify(byte[] plaintext, byte[] signed, PublicKey key) {
+    /***********************************************************************************/
+    /* Verifies a signature over a plaintext */
+    /*
+     * Arguments: the plaintext, the signature to be verified (signed)
+     * and the RSA public key
+     */
+    /* Returns TRUE if the signature was verified, false if not */
+    /***********************************************************************************/
+    public boolean verify(byte[] plaintext, byte[] signed, PublicKey key) {
 
-		boolean result = false;
+        boolean result = false;
 
-		try {
+        try {
 
-			// Gets a Signature object
-			Signature signature = Signature.getInstance("SHA1withRSA");
+            // Gets a signature object
+            Signature signature = Signature.getInstance("SHA1withRSA");
 
-			// TO-DO: initialize the signature oject with the public key
-			// ...
+            // Initialize the signature object with the public key
+            signature.initVerify(key);
 
-			// TO-DO: set plaintext as the bytes to be veryfied
-			// ...
+            // Set plaintext as the bytes to be verified
+            signature.update(plaintext);
 
-			// TO-DO: verify the signature (signed). Store the outcome in the boolean result
-			// ...
+            // Verify the signature (signed). Store the outcome in the boolean result
+            result = signature.verify(signed);
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-		return result;
-	}
-
+        return result;
+    }
 }
